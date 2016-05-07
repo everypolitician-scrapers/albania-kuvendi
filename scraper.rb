@@ -33,7 +33,7 @@ def scrape_list(url)
       name: p.css('h2').text.tidy,
       party_id: party_id,
       party: party,
-      email: p.css('a[href*="@"]/@href').text,
+      email: p.css('a[href*="@"]/@href').text.sub('mailto:',''),
       term: 8,
       image: p.css('.fusion-image-wrapper img/@src').text,
       source: p.css('h2 a/@href').text,
