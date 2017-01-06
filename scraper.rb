@@ -62,7 +62,7 @@ def scrape_person(url)
   member = cells[member_h + 1..(groups_h ? groups_h - 1 : -1)]
   groups = groups_h ? cells[groups_h + 1..-1] : []
 
-  data = {
+  {
     birth_date:  date_from(cells.find { |t| t.include?('Datëlindja') }),
     birth_place: cells.find(-> { ':' }) { |t| t.include?('Vendlindja') }.split(':', 2).last.tidy.sub(/\.$/, ''),
     area:        member.find(-> { ':' }) { |t| t.include? 'Qarku' }.split(':', 2).last.tidy.sub(/\.$/, ''),
