@@ -44,7 +44,7 @@ end
 def scrape_person(url)
   noko = noko_for(url)
   box = noko.css('.post-content')
-  cells = box.xpath('.//td').map(&:text).map { |t| t.split("\n") }.flatten.map(&:tidy).compact.reject(&:empty?)
+  cells = box.xpath('.//td').map(&:text).map { |t| t.split(Regexp.union("\n",/(Zgjedhur)/)) }.flatten.map(&:tidy).compact.reject(&:empty?)
   unless cells.any?
     warn "No data at #{url}"
     return {}
