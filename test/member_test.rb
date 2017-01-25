@@ -46,3 +46,20 @@ describe 'Member page without area data' do
                             birth_place: 'Shijak')
   end
 end
+
+# There is a case where the text "Vendlindja" (birth place) is displayed
+# but no birth date is given
+describe 'Member without birth place data but with "Vendlindja:" on page' do
+  around { |test| VCR.use_cassette('MartoAndrea', &test) }
+
+  subject do
+    url = 'https://www.parlament.al/deputet/andrea-marto/'
+    MemberPage.new(response: Scraped::Request.new(url: url).response)
+  end
+
+  it 'should have the expected data' do
+    subject.to_h.must_equal(area:        '',
+                            birth_place: '',
+                            birth_date:  '1957-09-05')
+  end
+end
