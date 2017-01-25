@@ -31,3 +31,18 @@ describe 'Member page with complete data' do
                             birth_place: 'Tiranë')
   end
 end
+
+describe 'Member page without area data' do
+  around { |test| VCR.use_cassette('DukaAgron', &test) }
+
+  subject do
+    url = 'https://www.parlament.al/deputet/agron-duka-2/'
+    MemberPage.new(response: Scraped::Request.new(url: url).response)
+  end
+
+  it 'should have the expected data' do
+    subject.to_h.must_equal(area:        '',
+                            birth_date:  '1958-01-22',
+                            birth_place: 'Shijak')
+  end
+end
