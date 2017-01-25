@@ -16,3 +16,18 @@ describe 'Member page without any data' do
                             area:        '')
   end
 end
+
+describe 'Member page with complete data' do
+  around { |test| VCR.use_cassette('RuliGenc', &test) }
+
+  subject do
+    url = 'https://www.parlament.al/deputet/genc-ruli/'
+    MemberPage.new(response: Scraped::Request.new(url: url).response)
+  end
+
+  it 'should have the expected data' do
+    subject.to_h.must_equal(area:        'Gjirokastër',
+                            birth_date:  '1958-04-11',
+                            birth_place: 'Tiranë')
+  end
+end
