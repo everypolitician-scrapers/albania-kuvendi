@@ -1,0 +1,43 @@
+---
+request:
+  method: get
+  uri: https://www.parlament.al/deputet/genc-pollo-2/
+  body:
+    encoding: US-ASCII
+    string: ''
+  headers:
+    Accept-Encoding:
+    - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+    Accept:
+    - "*/*"
+    User-Agent:
+    - Ruby
+response:
+  status:
+    code: 200
+    message: OK
+  headers:
+    Date:
+    - Wed, 15 Feb 2017 04:48:32 GMT
+    Server:
+    - Apache/2.4.17 (Win64) OpenSSL/1.0.1p PHP/5.6.16
+    X-Powered-By:
+    - PHP/5.6.16
+    Set-Cookie:
+    - _icl_current_language=sq; expires=Thu, 16-Feb-2017 04:48:33 GMT; Max-Age=86400;
+      path=/; domain=.parlament.al
+    Link:
+    - "<https://www.parlament.al/?p=9765>; rel=shortlink"
+    - <https://www.parlament.al/wp-json/>; rel="https://api.w.org/"
+    Last-Modified:
+    - Wed, 15 Feb 2017 04:48:40 GMT
+    Vary:
+    - Accept-Encoding
+    Content-Length:
+    - '35808'
+    Content-Type:
+    - text/html; charset=UTF-8
+  body:
+    encoding: ASCII-8BIT
+  http_version: 
+recorded_at: Wed, 15 Feb 2017 04:45:35 GMT
