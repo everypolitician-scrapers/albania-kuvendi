@@ -63,7 +63,7 @@ def scrape_person(url)
     area:        member.find(-> { ':' }) { |t| t.include? 'Qarku' }.split(':', 2).last.tidy.sub(/\.$/, ''),
     # faction: groups.find(->{":"}) { |t| t.include? "Grupi parlamentar:" }.split(':', 2).last.tidy.sub(/\.$/,''),
     commissions: groups.find(-> { '' }) { |t| t.include? 'Komisioni' }.tidy,
-  } rescue binding.pry
+  } rescue {} # TODO: get rid of this rescue!
 end
 
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
