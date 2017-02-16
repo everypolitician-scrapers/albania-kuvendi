@@ -34,6 +34,7 @@ def scrape_list(url)
       source:   p.css('h2 a/@href').text,
     }
     data.merge! scrape_person(data[:source])
+    # puts data.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h
     ScraperWiki.save_sqlite(%i(id term), data)
   end
 
