@@ -18,7 +18,7 @@ response:
     message: OK
   headers:
     Date:
-    - Wed, 15 Feb 2017 04:32:20 GMT
+    - Fri, 17 Feb 2017 10:26:19 GMT
     Server:
     - Apache/2.4.17 (Win64) OpenSSL/1.0.1p PHP/5.6.16
     X-Powered-By:
@@ -26,10 +26,10 @@ response:
     Vary:
     - Accept-Encoding
     Content-Length:
-    - '35491'
+    - '35493'
     Content-Type:
     - text/html; charset=UTF-8
   body:
     encoding: ASCII-8BIT
   http_version: 
-recorded_at: Wed, 15 Feb 2017 04:29:15 GMT
+recorded_at: Fri, 17 Feb 2017 10:23:14 GMT
