@@ -18,26 +18,26 @@ response:
     message: OK
   headers:
     Date:
-    - Tue, 21 Feb 2017 20:28:49 GMT
+    - Wed, 22 Feb 2017 16:47:51 GMT
     Server:
     - Apache/2.4.17 (Win64) OpenSSL/1.0.1p PHP/5.6.16
     X-Powered-By:
     - PHP/5.6.16
     Set-Cookie:
-    - _icl_current_language=sq; expires=Wed, 22-Feb-2017 20:28:49 GMT; Max-Age=86400;
+    - _icl_current_language=sq; expires=Thu, 23-Feb-2017 16:47:51 GMT; Max-Age=86400;
       path=/; domain=.parlament.al
     Link:
     - "<https://www.parlament.al/?p=9581>; rel=shortlink"
     - <https://www.parlament.al/wp-json/>; rel="https://api.w.org/"
     Last-Modified:
-    - Tue, 21 Feb 2017 20:28:56 GMT
+    - Wed, 22 Feb 2017 16:47:58 GMT
     Vary:
     - Accept-Encoding
     Content-Length:
-    - '35640'
+    - '35641'
     Content-Type:
     - text/html; charset=UTF-8
   body:
     encoding: ASCII-8BIT
   http_version: 
-recorded_at: Tue, 21 Feb 2017 20:25:51 GMT
+recorded_at: Wed, 22 Feb 2017 16:44:53 GMT
