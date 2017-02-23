@@ -52,7 +52,8 @@ def scrape_person(url)
     return {}
   end
 
-  member_h = cells.find_index { |t| t.start_with? 'Zgjedhur' } or binding.pry
+  # TODO cope with these being missing
+  member_h = cells.find_index { |t| t.start_with? 'Zgjedhur' } or return {}
   groups_h = cells.find_index { |t| t.start_with? 'Grupi' }
 
   member = cells[member_h + 1..(groups_h ? groups_h - 1 : -1)]
