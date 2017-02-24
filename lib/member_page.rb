@@ -33,7 +33,7 @@ class MemberPage < Scraped::HTML
   end
 
   def table
-    noko.xpath('//div[contains(@class,"post-content")]/table')
+    noko.xpath('//div[contains(@class,"post-content")]')
   end
 
   def date_from(text)
