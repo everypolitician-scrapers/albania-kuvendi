@@ -47,4 +47,13 @@ describe 'member data' do
                               birth_date:  '1957-09-05')
     end
   end
+
+  describe 'Anastas Angjeli' do
+    let(:yaml_data) { YAML.load_file('test/data/AnastasAngjeli.yml').to_h }
+    let(:url)       { yaml_data[:url] }
+
+    it 'should have the expected data' do
+      yaml_data[:to_h].must_equal subject.to_h
+    end
+  end
 end
