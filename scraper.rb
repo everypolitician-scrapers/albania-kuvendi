@@ -6,6 +6,8 @@ require 'pry'
 require 'scraped'
 require 'scraperwiki'
 
+require_rel 'lib'
+
 # require 'open-uri/cached'
 # OpenURI::Cache.cache_path = '.cache'
 require 'scraped_page_archive/open-uri'
@@ -17,6 +19,11 @@ end
 def date_from(text)
   return if text.to_s.tidy.empty?
   Date.parse(text).to_s rescue ''
+end
+
+def scrape(h)
+  url, klass = h.to_a.first
+  klass.new(response: Scraped::Request.new(url: url).response)
 end
 
 def scrape_list(url)
@@ -33,7 +40,7 @@ def scrape_list(url)
       image:    p.css('.fusion-image-wrapper img/@src').text,
       source:   p.css('h2 a/@href').text,
     }
-    data.merge! scrape_person(data[:source])
+    data.merge! (scrape data[:source] => MemberPage).to_h
     # puts data.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h
     ScraperWiki.save_sqlite(%i(id term), data)
   end
@@ -41,31 +48,6 @@ def scrape_list(url)
   unless (next_page = noko.css('a.next/@href')).empty?
     scrape_list next_page.text
   end
-end
-
-def scrape_person(url)
-  noko = noko_for(url)
-  box = noko.css('.post-content')
-  cells = box.xpath('.//td').map(&:text).map { |t| t.split("\n") }.flatten.map(&:tidy).compact.reject(&:empty?)
-  unless cells.any?
-    warn "No data at #{url}"
-    return {}
-  end
-
-  # TODO cope with these being missing
-  member_h = cells.find_index { |t| t.start_with? 'Zgjedhur' } or return {}
-  groups_h = cells.find_index { |t| t.start_with? 'Grupi' }
-
-  member = cells[member_h + 1..(groups_h ? groups_h - 1 : -1)]
-  groups = groups_h ? cells[groups_h + 1..-1] : []
-
-  {
-    birth_date:  date_from(cells.find { |t| t.include?('Datëlindja') }),
-    birth_place: cells.find(-> { ':' }) { |t| t.include?('Vendlindja') }.split(':', 2).last.tidy.sub(/\.$/, ''),
-    area:        member.find(-> { ':' }) { |t| t.include? 'Qarku' }.split(':', 2).last.tidy.sub(/\.$/, ''),
-    # faction: groups.find(->{":"}) { |t| t.include? "Grupi parlamentar:" }.split(':', 2).last.tidy.sub(/\.$/,''),
-    commissions: groups.find(-> { '' }) { |t| t.include? 'Komisioni' }.tidy,
-  } rescue {} # TODO: get rid of this rescue!
 end
 
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
