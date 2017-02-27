@@ -40,7 +40,7 @@ def scrape_list(url)
       image:    p.css('.fusion-image-wrapper img/@src').text,
       source:   p.css('h2 a/@href').text,
     }
-    data.merge! (scrape data[:source] => MemberPage).to_h
+    data.merge! (scrape data[:source] => MemberPage).to_h unless urls_to_skip.include? data[:source]
     # puts data.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h
     ScraperWiki.save_sqlite(%i(id term), data)
   end
@@ -48,6 +48,14 @@ def scrape_list(url)
   unless (next_page = noko.css('a.next/@href')).empty?
     scrape_list next_page.text
   end
+end
+
+def urls_to_skip
+  [
+    'https://www.parlament.al/deputet/genc-ruli/',
+    'https://www.parlament.al/deputet/gramoz-ruci/',
+    'https://www.parlament.al/deputet/myqerem-tafaj/'
+  ]
 end
 
 ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
