@@ -12,42 +12,16 @@ require_rel 'lib'
 # OpenURI::Cache.cache_path = '.cache'
 require 'scraped_page_archive/open-uri'
 
-def noko_for(url)
-  Nokogiri::HTML(open(url).read)
-end
-
-def date_from(text)
-  return if text.to_s.tidy.empty?
-  Date.parse(text).to_s rescue ''
-end
-
 def scrape(h)
   url, klass = h.to_a.first
   klass.new(response: Scraped::Request.new(url: url).response)
 end
 
-def scrape_list(url)
-  noko = noko_for(url)
-  noko.css('.fusion-portfolio-post').each do |p|
-    party_id, party = p.css('.fusion-portfolio-content h4').text.tidy.split(':', 2)
-    data = {
-      id:       p.attr('class')[/post-(\d+)/, 1],
-      name:     p.css('h2').text.tidy,
-      party_id: party_id,
-      party:    party,
-      email:    p.css('a[href*="@"]/@href').text.sub('mailto:', ''),
-      term:     8,
-      image:    p.css('.fusion-image-wrapper img/@src').text,
-      source:   p.css('h2 a/@href').text,
-    }
-    data.merge! (scrape data[:source] => MemberPage).to_h unless urls_to_skip.include? data[:source]
-    # puts data.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h
-    ScraperWiki.save_sqlite(%i[id term], data)
-  end
-
-  unless (next_page = noko.css('a.next/@href')).empty?
-    scrape_list next_page.text
-  end
+def member_rows(url, rows = nil)
+  members_page = (scrape url => MembersPage)
+  rows = rows.to_a + members_page.member_rows
+  return rows if members_page.next_page.empty?
+  member_rows(members_page.next_page.text, rows)
 end
 
 def urls_to_skip
@@ -58,5 +32,12 @@ def urls_to_skip
   ]
 end
 
+data = member_rows('http://www.parlament.al/atribut/deputet/').map(&:to_h)
+                                                              .map do |row|
+  row.merge!((scrape row[:source] => MemberPage).to_h) unless urls_to_skip.include? row[:source]
+  row.merge(term: 8)
+end
+
+# data.each { |d| puts d.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h }
 ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
-scrape_list('http://www.parlament.al/atribut/deputet/')
+ScraperWiki.save_sqlite(%i[id term], data)
