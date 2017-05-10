@@ -68,5 +68,5 @@ def scrape_person(url)
   } rescue {} # TODO: get rid of this rescue!
 end
 
-ScraperWiki.sqliteexecute('DELETE FROM data') rescue nil
+ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
 scrape_list('http://www.parlament.al/atribut/deputet/')
