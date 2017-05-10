@@ -6,9 +6,9 @@ require 'pry'
 require 'scraped'
 require 'scraperwiki'
 
-# require 'open-uri/cached'
-# OpenURI::Cache.cache_path = '.cache'
-require 'scraped_page_archive/open-uri'
+require 'open-uri/cached'
+OpenURI::Cache.cache_path = '.cache'
+# require 'scraped_page_archive/open-uri'
 
 def noko_for(url)
   Nokogiri::HTML(open(url).read)
@@ -35,7 +35,7 @@ def scrape_list(url)
     }
     data.merge! scrape_person(data[:source])
     # puts data.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h
-    ScraperWiki.save_sqlite(%i(id term), data)
+    ScraperWiki.save_sqlite(%i[id term], data)
   end
 
   unless (next_page = noko.css('a.next/@href')).empty?
@@ -52,7 +52,7 @@ def scrape_person(url)
     return {}
   end
 
-  # TODO cope with these being missing
+  # TODO: cope with these being missing
   member_h = cells.find_index { |t| t.start_with? 'Zgjedhur' } or return {}
   groups_h = cells.find_index { |t| t.start_with? 'Grupi' }
 
