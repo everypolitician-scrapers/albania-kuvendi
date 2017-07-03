@@ -8,7 +8,8 @@ class MemberPage < Scraped::HTML
   end
 
   field :birth_place do
-    cells.find(-> { ':' }) { |t| t.include?('Vendlindja') }.split(':', 2).last.tidy.sub(/\.$/, '')
+    return unless birth_place_record
+    birth_place_record.tidy.chomp('.')
   end
 
   field :area do
@@ -51,5 +52,9 @@ class MemberPage < Scraped::HTML
   def date_from(text)
     return if text.to_s.tidy.empty?
     Date.parse(text).to_s rescue ''
+  end
+
+  def birth_place_record
+    noko.xpath('.//span[contains(., "Vendlindja")]').text.split(':').last
   end
 end
