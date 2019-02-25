@@ -1,49 +1,86 @@
 #!/bin/env ruby
-# encoding: utf-8
 # frozen_string_literal: true
 
-require 'pry'
 require 'scraped'
 require 'scraperwiki'
 
 require 'open-uri/cached'
 OpenURI::Cache.cache_path = '.cache'
-# require 'scraped_page_archive/open-uri'
 
-require_rel 'lib'
+class MembersPage < Scraped::HTML
+  decorator Scraped::Response::Decorator::CleanUrls
 
-def scrape(h)
-  url, klass = h.to_a.first
-  klass.new(response: Scraped::Request.new(url: url).response)
-end
+  field :members do
+    data = member_urls.map { |url| Scraped::Scraper.new(url => MemberPage).scraper.to_h }
+    return [] if data.empty?
+    return data unless next_page
 
-def noko_for(url)
-  Nokogiri::HTML(open(url).read)
-end
-
-def scrape_list(url)
-  noko = noko_for(url)
-  noko.css('.fusion-portfolio-post').each do |p|
-    party_id, party = p.css('.fusion-portfolio-content h4').text.tidy.split(':', 2)
-    data = {
-      id:       p.attr('class')[/post-(\d+)/, 1],
-      name:     p.css('h2').text.tidy,
-      party_id: party_id,
-      party:    party,
-      email:    p.css('a[href*="@"]/@href').text.sub('mailto:', ''),
-      term:     8,
-      image:    p.css('.fusion-image-wrapper img/@src').text,
-      source:   p.css('h2 a/@href').text,
-    }
-    data.merge!((scrape data[:source] => MemberPage).to_h)
-    # puts data.reject { |k, v| v.to_s.empty? }.sort_by { |k, v| k }.to_h
-    ScraperWiki.save_sqlite(%i[id term], data)
+    data + Scraped::Scraper.new(next_page => MembersPage).scraper.members
   end
 
-  unless (next_page = noko.css('a.next/@href')).empty?
-    scrape_list next_page.text
+  private
+
+  def member_cells
+    noko.css('.col-md-3')
+  end
+
+  def member_urls
+    member_cells.map { |mp| fragment(mp => MemberCell).url }
+  end
+
+  def next_link
+    noko.xpath('//ul[@class="pagination"]//a[.="Pas"]')
+  end
+
+  def next_page
+    return if next_link.attr('onclick').to_s.include?('return false')
+    next_link.attr('href')
   end
 end
 
-ScraperWiki.sqliteexecute('DROP TABLE data') rescue nil
-scrape_list('http://www.parlament.al/atribut/deputet/')
+class MemberCell < Scraped::HTML
+  field :url do
+    noko.css('a/@href').text
+  end
+end
+
+class MemberPage < Scraped::HTML
+  decorator Scraped::Response::Decorator::CleanUrls
+
+  field :id do
+    url.split('/').last
+  end
+
+  field :family_name do
+    box.xpath('.//td[contains(.,"Emër:")]//following-sibling::td').text.tidy
+  end
+
+  field :given_name do
+    box.xpath('.//td[contains(.,"Mbiemër:")]//following-sibling::td').text.tidy
+  end
+
+  field :birth_date do
+    dob.split('.').reverse.join('-')
+  end
+
+  field :email do
+    box.xpath('.//td[contains(.,"Email:")]//following-sibling::td').text.tidy
+  end
+
+  field :image do
+    box.css('img/@src').text
+  end
+
+  private
+
+  def box
+    noko.css('.panel-body')
+  end
+
+  def dob
+    box.xpath('.//td[contains(.,"Datëlindje:")]//following-sibling::td').text.tidy
+  end
+end
+
+url = 'http://www.parlament.al/Anetar/AllAnetar'
+Scraped::Scraper.new(url => MembersPage).store(:members)
