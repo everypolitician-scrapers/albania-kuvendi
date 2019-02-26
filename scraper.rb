@@ -34,6 +34,7 @@ class MembersPage < Scraped::HTML
 
   def next_page
     return if next_link.attr('onclick').to_s.include?('return false')
+
     next_link.attr('href')
   end
 end
@@ -51,12 +52,20 @@ class MemberPage < Scraped::HTML
     url.split('/').last
   end
 
+  field :name do
+    [given_name, family_name].join(' ')
+  end
+
+  field :sort_name do
+    [family_name, given_name].join(' ')
+  end
+
   field :family_name do
-    box.xpath('.//td[contains(.,"Emër:")]//following-sibling::td').text.tidy
+    box.xpath('.//td[contains(.,"Mbiemër:")]//following-sibling::td').text.tidy
   end
 
   field :given_name do
-    box.xpath('.//td[contains(.,"Mbiemër:")]//following-sibling::td').text.tidy
+    box.xpath('.//td[contains(.,"Emër:")]//following-sibling::td').text.tidy
   end
 
   field :birth_date do
