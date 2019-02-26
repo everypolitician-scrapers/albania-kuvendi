@@ -69,6 +69,8 @@ class MemberPage < Scraped::HTML
   end
 
   field :birth_date do
+    return if dob == '-'
+
     dob.split('.').reverse.join('-')
   end
 
